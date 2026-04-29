@@ -34,7 +34,7 @@ function formatPace(ms: number) {
   const secsPerKm = 1000 / ms;
   const m = Math.floor(secsPerKm / 60);
   const s = Math.round(secsPerKm % 60);
-  return `${m}:${s.toString().padStart(2, "0")}/km`;
+  return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
 export default function Home() {
@@ -77,132 +77,216 @@ export default function Home() {
   }, [regions]);
 
   const overallPace = totals.time > 0 ? totals.distance / totals.time : 0;
-  const placeLabel = region === "world" ? "COUNTRIES" : "STATES";
+  const placeLabel = region === "world" ? "Countries" : "States";
+
+  function handleShare() {
+    const text = `My Running Passport — ${regions.length} ${placeLabel.toLowerCase()}, ${formatDistance(totals.distance)} km of ${category.toLowerCase()}.`;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      navigator.share({ title: "Running Passport", text, url: window.location.href }).catch(() => {});
+    } else if (typeof navigator !== "undefined") {
+      navigator.clipboard?.writeText(`${text} ${window.location.href}`);
+    }
+  }
 
   return (
-    <main className="flex flex-col items-center py-8 px-4 gap-6 max-w-2xl mx-auto">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold tracking-tight">Running Passport</h1>
-      </div>
+    <main className="min-h-screen flex flex-col items-center px-5 py-6 max-w-2xl mx-auto">
+      {/* Editorial brand header */}
+      <header className="w-full flex items-start justify-between text-[10px] tracking-[0.25em] uppercase font-mono text-ink-dim mb-6">
+        <span>+ A Concept By</span>
+        <span className="text-ink">Running · Passport</span>
+        <span>No. 001 +</span>
+      </header>
 
-      {status === "loading" && <p className="text-slate-400">Loading...</p>}
+      {status === "loading" && <p className="text-ink-dim">Loading...</p>}
 
       {status === "unauthenticated" && (
-        <button
-          onClick={() => signIn("strava")}
-          className="mt-12 flex items-center gap-3 bg-[#93D94E] hover:bg-[#a8e562] transition-colors text-[#223240] font-semibold px-6 py-3 rounded-xl text-lg"
-        >
-          Connect Strava
-        </button>
+        <div className="flex flex-col items-center gap-8 mt-20">
+          <h1 className="font-serif text-7xl text-center leading-[0.95]">
+            Every step,<br />
+            <span className="italic text-passport-accent">stamped.</span>
+          </h1>
+          <p className="text-ink-dim max-w-sm text-center text-sm leading-relaxed">
+            Connect your Strava and watch your runs map themselves into a passport of every country and state you&apos;ve been moving in.
+          </p>
+          <button
+            onClick={() => signIn("strava")}
+            className="bg-passport-accent hover:bg-[#a8e562] transition-colors text-canvas font-semibold px-7 py-3 rounded-full text-sm tracking-wide"
+          >
+            CONNECT STRAVA →
+          </button>
+        </div>
       )}
 
       {status === "authenticated" && (
-        <div className="w-full flex flex-col gap-6">
-          <div className="flex items-center justify-between text-sm text-slate-400">
-            <span>
-              Signed in as <span className="text-white font-medium">{session.user?.name}</span>
-            </span>
-            <button onClick={() => signOut()} className="hover:text-white transition-colors">
-              Sign out
+        <div className="w-full flex flex-col gap-8">
+          {/* Account row */}
+          <div className="flex items-center justify-between text-xs text-ink-dim font-mono uppercase tracking-wider">
+            <span>{session.user?.name}</span>
+            <button onClick={() => signOut()} className="hover:text-ink transition-colors">
+              Sign out →
             </button>
           </div>
 
-          {loading && <p className="text-center text-slate-400">Fetching your activities...</p>}
+          {loading && <p className="text-center text-ink-dim text-sm">Fetching activities...</p>}
 
           {data && (
             <>
-              {/* Region selector */}
-              <div className="grid grid-cols-2 gap-2 bg-white/5 p-1 rounded-2xl">
-                <RegionTab label="🌍 World" active={region === "world"} onClick={() => setRegion("world")} />
-                <RegionTab label="🇺🇸 USA" active={region === "usa"} onClick={() => setRegion("usa")} />
-              </div>
-
-              {/* Category selector */}
-              <div className="grid grid-cols-3 gap-2 bg-white/5 p-1 rounded-2xl">
-                {data.categories.map((c) => (
-                  <button
-                    key={c}
-                    onClick={() => setCategory(c)}
-                    className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                      category === c
-                        ? "bg-[#93D94E] text-[#223240] shadow-lg"
-                        : "text-slate-300 hover:text-white"
-                    }`}
-                  >
-                    <span className="text-base leading-none">{CATEGORY_ICONS[c]}</span>
-                    {c}
-                  </button>
-                ))}
-              </div>
-
-              {/* Year tabs */}
-              <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
-                <YearTab
-                  label="ALL-TIME"
-                  active={scope === "allTime"}
-                  onClick={() => setScope("allTime")}
+              {/* Filter controls */}
+              <div className="flex flex-col gap-3">
+                <SegmentedControl
+                  options={[
+                    { value: "world", label: "🌍 World" },
+                    { value: "usa", label: "🇺🇸 USA" },
+                  ]}
+                  value={region}
+                  onChange={(v) => setRegion(v as Region)}
                 />
-                {data.years.map((year) => (
+                <SegmentedControl
+                  options={data.categories.map((c) => ({
+                    value: c,
+                    label: `${CATEGORY_ICONS[c]} ${c}`,
+                  }))}
+                  value={category}
+                  onChange={(v) => setCategory(v as Category)}
+                />
+                <div className="flex gap-1.5 overflow-x-auto -mx-5 px-5 scrollbar-hide pb-1">
                   <YearTab
-                    key={year}
-                    label={String(year)}
-                    active={scope === String(year)}
-                    onClick={() => setScope(String(year))}
+                    label="ALL TIME"
+                    active={scope === "allTime"}
+                    onClick={() => setScope("allTime")}
                   />
-                ))}
+                  {data.years.map((year) => (
+                    <YearTab
+                      key={year}
+                      label={String(year)}
+                      active={scope === String(year)}
+                      onClick={() => setScope(String(year))}
+                    />
+                  ))}
+                </div>
               </div>
 
-              {/* Map hero */}
-              <WorldMap
-                region={region}
-                activeCodes={regions.map((r) => r.code)}
-                activeRegions={regions.map((r) => ({ name: r.name, code: r.code }))}
-                points={scoped?.points ?? []}
-              />
+              {/* PASSPORT POSTER — the shareable hero */}
+              <section className="relative grain bg-canvas-raised rounded-3xl border border-canvas-line overflow-hidden">
+                {/* Corner marks */}
+                <div className="absolute top-3 left-3 font-mono text-[10px] text-ink-faint">+</div>
+                <div className="absolute top-3 right-3 font-mono text-[10px] text-ink-faint">+</div>
+                <div className="absolute bottom-3 left-3 font-mono text-[10px] text-ink-faint">+</div>
+                <div className="absolute bottom-3 right-3 font-mono text-[10px] text-ink-faint">+</div>
 
-              {/* Passport title block */}
-              <div className="border-t border-b border-[#3B8C66]/30 py-4">
-                <h2 className="text-2xl font-extrabold tracking-wide uppercase">
-                  My Running Passport
-                </h2>
-                <p className="text-xs text-slate-400/80 tracking-[0.25em] mt-1">
-                  PASSPORT · PASS · PASAPORTE
-                </p>
-              </div>
+                <div className="px-5 pt-6 pb-2 flex items-start justify-between">
+                  <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-ink-dim">
+                    {region === "world" ? "World Edition" : "USA Edition"}
+                  </div>
+                  <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-ink-dim">
+                    {scope === "allTime" ? "All Time" : scope}
+                  </div>
+                </div>
 
-              {/* Big stats grid */}
-              <div className="grid grid-cols-2 gap-x-6 gap-y-5">
-                <BigStat label="ACTIVITIES" value={totals.activities.toString()} />
-                <BigStat label="DISTANCE" value={formatDistance(totals.distance)} unit="km" />
-                <BigStat label="MOVING TIME" value={formatTime(totals.time)} />
-                <BigStat label={placeLabel} value={regions.length.toString()} />
-                <BigStat
-                  label="ELEVATION"
-                  value={Math.round(totals.elevation).toLocaleString()}
-                  unit="m"
-                />
-                <BigStat label="AVG PACE" value={formatPace(overallPace)} />
-              </div>
+                {/* Hero map */}
+                <div className="px-3">
+                  <WorldMap
+                    region={region}
+                    activeCodes={regions.map((r) => r.code)}
+                    activeRegions={regions.map((r) => ({ name: r.name, code: r.code }))}
+                    points={scoped?.points ?? []}
+                  />
+                </div>
+
+                {/* Title block */}
+                <div className="px-5 pt-2 pb-4">
+                  <h2 className="font-serif text-5xl leading-[0.95] tracking-tight">
+                    Running <span className="italic text-passport-accent">Passport</span>
+                  </h2>
+                  <p className="font-mono text-[10px] tracking-[0.3em] mt-2 text-ink-dim uppercase">
+                    Passport · Pass · Pasaporte
+                  </p>
+                </div>
+
+                {/* Magazine-style stats */}
+                <div className="px-5 pb-5">
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-6 border-t border-canvas-line pt-5">
+                    <BigStat
+                      label={placeLabel}
+                      value={regions.length.toString()}
+                      highlight
+                    />
+                    <BigStat
+                      label="Activities"
+                      value={totals.activities.toString()}
+                    />
+                    <BigStat
+                      label="Distance"
+                      value={formatDistance(totals.distance)}
+                      unit="km"
+                    />
+                    <BigStat
+                      label="Moving Time"
+                      value={formatTime(totals.time)}
+                    />
+                    <BigStat
+                      label="Elevation"
+                      value={Math.round(totals.elevation).toLocaleString()}
+                      unit="m"
+                    />
+                    <BigStat
+                      label="Avg Pace"
+                      value={formatPace(overallPace)}
+                      unit="/km"
+                    />
+                  </div>
+
+                  {/* Issued line */}
+                  <div className="mt-6 pt-4 border-t border-canvas-line flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-ink-faint">
+                    <span>Issued · {(session.user?.name ?? "Athlete").split(" ")[0]}</span>
+                    <span>RP · 2026</span>
+                  </div>
+                </div>
+              </section>
+
+              {/* Share button */}
+              <button
+                onClick={handleShare}
+                className="self-center -mt-2 font-mono text-[11px] uppercase tracking-[0.2em] text-ink-dim hover:text-passport-accent transition-colors px-5 py-2 border border-canvas-line rounded-full"
+              >
+                ↗ Share Passport
+              </button>
 
               {/* Per-region breakdown */}
-              <div className="flex flex-col gap-3">
-                {regions.map((r) => (
-                  <RegionCard key={r.code} stats={r} />
-                ))}
-                {regions.length === 0 && (
-                  <p className="text-center text-slate-400/80 text-sm py-8">
-                    No {category} activities {scope === "allTime" ? "yet" : `in ${scope}`}
-                    {region === "usa" ? " in the USA" : ""}.
-                  </p>
-                )}
-              </div>
+              {regions.length > 0 && (
+                <section className="flex flex-col gap-4">
+                  <div className="flex items-baseline justify-between">
+                    <h3 className="font-serif text-2xl">
+                      The <span className="italic">{placeLabel}</span>
+                    </h3>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-dim">
+                      {regions.length} {placeLabel}
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {regions.map((r, i) => (
+                      <RegionRow key={r.code} stats={r} rank={i + 1} />
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {regions.length === 0 && (
+                <p className="text-center text-ink-dim text-sm py-8 font-mono uppercase tracking-wider text-[11px]">
+                  No {category} activities {scope === "allTime" ? "yet" : `in ${scope}`}
+                  {region === "usa" ? " · USA" : ""}.
+                </p>
+              )}
 
               {/* MRZ-style footer */}
-              <div className="mt-4 pt-4 border-t border-[#3B8C66]/30">
-                <p className="font-mono text-[10px] text-slate-400/60 break-all leading-relaxed">
+              <footer className="mt-2 pt-6 border-t border-canvas-line">
+                <p className="font-mono text-[10px] text-ink-faint break-all leading-relaxed">
                   {`${region.toUpperCase()}<<${scope === "allTime" ? "ALLTIME" : scope}<<${(session.user?.name ?? "ATHLETE").toUpperCase().replace(/\s+/g, "<")}<<RUNNING<<<<<PASSPORT<<<`}
                 </p>
-              </div>
+                <p className="font-mono text-[10px] tracking-[0.3em] uppercase text-ink-faint mt-3 text-center">
+                  · End of Passport ·
+                </p>
+              </footer>
             </>
           )}
         </div>
@@ -211,24 +295,34 @@ export default function Home() {
   );
 }
 
-function RegionTab({
-  label,
-  active,
-  onClick,
+function SegmentedControl<T extends string>({
+  options,
+  value,
+  onChange,
 }: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
+  options: { value: T; label: string }[];
+  value: T;
+  onChange: (v: T) => void;
 }) {
   return (
-    <button
-      onClick={onClick}
-      className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-        active ? "bg-[#93D94E] text-[#223240] shadow-lg" : "text-slate-300 hover:text-white"
-      }`}
+    <div
+      className="grid gap-1 bg-canvas-raised border border-canvas-line p-1 rounded-full"
+      style={{ gridTemplateColumns: `repeat(${options.length}, 1fr)` }}
     >
-      {label}
-    </button>
+      {options.map((o) => (
+        <button
+          key={o.value}
+          onClick={() => onChange(o.value)}
+          className={`flex items-center justify-center gap-2 py-2 rounded-full text-xs font-medium transition-colors ${
+            value === o.value
+              ? "bg-passport-accent text-canvas"
+              : "text-ink-dim hover:text-ink"
+          }`}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
   );
 }
 
@@ -244,10 +338,10 @@ function YearTab({
   return (
     <button
       onClick={onClick}
-      className={`shrink-0 px-4 py-2 rounded-full text-sm font-bold tracking-wide transition-colors ${
+      className={`shrink-0 px-3.5 py-1.5 rounded-full text-[11px] font-mono tracking-wider uppercase transition-colors ${
         active
-          ? "bg-white/10 text-white border border-white/20"
-          : "text-slate-400/80 hover:text-white"
+          ? "bg-canvas-raised text-passport-accent border border-passport-accent/40"
+          : "text-ink-dim hover:text-ink border border-canvas-line"
       }`}
     >
       {label}
@@ -259,48 +353,47 @@ function BigStat({
   label,
   value,
   unit,
+  highlight,
 }: {
   label: string;
   value: string;
   unit?: string;
+  highlight?: boolean;
 }) {
   return (
     <div>
-      <p className="text-xs text-slate-400/80 tracking-wider mb-1">{label}</p>
-      <p className="text-3xl font-extrabold tracking-tight">
+      <p className="font-mono text-[10px] tracking-[0.25em] uppercase text-ink-dim mb-1.5">
+        {label}
+      </p>
+      <p className={`font-serif text-5xl leading-[0.95] tracking-tight ${highlight ? "text-passport-accent" : "text-ink"}`}>
         {value}
-        {unit && <span className="text-xl font-bold text-slate-300/80 ml-1">{unit}</span>}
+        {unit && (
+          <span className="font-serif italic text-2xl text-ink-dim ml-1">{unit}</span>
+        )}
       </p>
     </div>
   );
 }
 
-function RegionCard({ stats }: { stats: RegionStats }) {
+function RegionRow({ stats, rank }: { stats: RegionStats; rank: number }) {
   return (
-    <div className="bg-white/5 rounded-2xl p-4 flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <h3 className="font-semibold">{stats.name}</h3>
-        <span className="text-xs text-slate-400/80 bg-white/5 px-2 py-1 rounded-full">
-          {stats.activityCount} {stats.activityCount === 1 ? "activity" : "activities"}
-        </span>
+    <div className="bg-canvas-raised border border-canvas-line rounded-2xl px-4 py-3 flex items-center gap-4">
+      <span className="font-mono text-[10px] text-ink-faint w-6">
+        {rank.toString().padStart(2, "0")}
+      </span>
+      <div className="flex-1 min-w-0">
+        <h4 className="font-serif text-xl leading-tight truncate">{stats.name}</h4>
+        <p className="font-mono text-[10px] uppercase tracking-wider text-ink-dim mt-0.5">
+          {stats.activityCount} {stats.activityCount === 1 ? "act" : "acts"} ·{" "}
+          {(stats.totalDistance / 1000).toFixed(1)} km · {formatTime(stats.totalMovingTime)}
+        </p>
       </div>
-      <div className="grid grid-cols-3 gap-2 text-sm">
-        <MiniStat label="Distance" value={`${(stats.totalDistance / 1000).toFixed(1)} km`} />
-        <MiniStat label="Time" value={formatTime(stats.totalMovingTime)} />
-        <MiniStat label="Pace" value={formatPace(stats.averageSpeed)} />
-        <MiniStat label="Elevation" value={`${Math.round(stats.totalElevationGain)} m`} />
-        <MiniStat label="Kudos" value={stats.totalKudos.toString()} />
-        <MiniStat label="PRs" value={stats.totalPRs.toString()} />
+      <div className="text-right">
+        <p className="font-serif text-2xl leading-none">
+          {(stats.totalDistance / 1000).toFixed(0)}
+          <span className="font-serif italic text-sm text-ink-dim ml-0.5">km</span>
+        </p>
       </div>
-    </div>
-  );
-}
-
-function MiniStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="text-[10px] text-slate-400/80 uppercase tracking-wider">{label}</p>
-      <p className="font-semibold">{value}</p>
     </div>
   );
 }

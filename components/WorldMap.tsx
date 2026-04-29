@@ -43,15 +43,11 @@ export function WorldMap({ region, activeCodes, activeRegions, points }: WorldMa
   );
 
   return (
-    <div className="w-full flex flex-col gap-4">
-      <div className="w-full rounded-2xl overflow-hidden bg-[#1a2530]">
+    <div className="w-full flex flex-col gap-3">
+      <div className="w-full rounded-2xl overflow-hidden">
         <ComposableMap
           projection={isUSA ? "geoAlbersUsa" : "geoMercator"}
-          projectionConfig={
-            isUSA
-              ? { scale: 900 }
-              : { scale: 100, center: [0, 0] }
-          }
+          projectionConfig={isUSA ? { scale: 900 } : { scale: 100, center: [0, 0] }}
           width={800}
           height={isUSA ? 460 : 500}
           style={{ width: "100%", height: "auto", display: "block" }}
@@ -64,12 +60,12 @@ export function WorldMap({ region, activeCodes, activeRegions, points }: WorldMa
                   <Geography
                     key={geo.rsmKey}
                     geography={geo}
-                    fill={isActive ? "#93D94E" : "#347355"}
-                    stroke="#223240"
+                    fill={isActive ? "#93D94E" : "#1d2e25"}
+                    stroke="#0b1410"
                     strokeWidth={0.4}
                     style={{
                       default: { outline: "none" },
-                      hover: { outline: "none", fill: isActive ? "#a8e562" : "#3B8C66" },
+                      hover: { outline: "none", fill: isActive ? "#a8e562" : "#243a30" },
                       pressed: { outline: "none" },
                     }}
                   />
@@ -79,14 +75,14 @@ export function WorldMap({ region, activeCodes, activeRegions, points }: WorldMa
           </Geographies>
           {points.map((p, i) => (
             <Marker key={i} coordinates={[p.lng, p.lat]}>
-              <circle r={2.5} fill="#ffffff" stroke="#223240" strokeWidth={0.6} opacity={0.95} />
+              <circle r={2} fill="#f5f1e8" stroke="#0b1410" strokeWidth={0.5} opacity={0.9} />
             </Marker>
           ))}
         </ComposableMap>
       </div>
 
       {activeRegions.length > 0 && (
-        <div className="flex flex-wrap gap-1 justify-center px-2">
+        <div className="flex flex-wrap gap-1 justify-center px-3 pb-1">
           {activeRegions.map((r) => (
             <RegionBadge key={r.code} name={r.name} code={r.code} region={region} />
           ))}
