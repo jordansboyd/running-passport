@@ -23,8 +23,8 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Running Passport",
-  description: "Every country and state you've run in, in one place.",
+  title: "Stamped",
+  description: "Every step, stamped. Your Strava activities mapped into a personal atlas.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

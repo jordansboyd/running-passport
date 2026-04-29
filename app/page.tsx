@@ -80,9 +80,9 @@ export default function Home() {
   const placeLabel = region === "world" ? "Countries" : "States";
 
   function handleShare() {
-    const text = `My Running Passport — ${regions.length} ${placeLabel.toLowerCase()}, ${formatDistance(totals.distance)} km of ${category.toLowerCase()}.`;
+    const text = `Stamped — ${regions.length} ${placeLabel.toLowerCase()}, ${formatDistance(totals.distance)} km of ${category.toLowerCase()}.`;
     if (typeof navigator !== "undefined" && navigator.share) {
-      navigator.share({ title: "Running Passport", text, url: window.location.href }).catch(() => {});
+      navigator.share({ title: "Stamped", text, url: window.location.href }).catch(() => {});
     } else if (typeof navigator !== "undefined") {
       navigator.clipboard?.writeText(`${text} ${window.location.href}`);
     }
@@ -93,7 +93,7 @@ export default function Home() {
       {/* Editorial brand header */}
       <header className="w-full flex items-start justify-between text-[10px] tracking-[0.25em] uppercase font-mono text-ink-dim mb-6">
         <span>+ A Concept By</span>
-        <span className="text-ink">Running · Passport</span>
+        <span className="text-ink">Stamped</span>
         <span>No. 001 +</span>
       </header>
 
@@ -106,7 +106,7 @@ export default function Home() {
             <span className="italic text-passport-accent">stamped.</span>
           </h1>
           <p className="text-ink-dim max-w-sm text-center text-sm leading-relaxed">
-            Connect your Strava and watch your runs map themselves into a passport of every country and state you&apos;ve been moving in.
+            Connect your Strava and watch every run, hike, and ride get stamped onto a personal atlas of every country and state you&apos;ve moved in.
           </p>
           <button
             onClick={() => signIn("strava")}
@@ -197,10 +197,10 @@ export default function Home() {
                 <div className="px-5 pt-2 pb-4">
                   <h2 className="font-serif text-5xl leading-[0.95] tracking-tight">
                     {category === "Hike" ? "Hiking" : category === "Ride" ? "Cycling" : "Running"}{" "}
-                    <span className="italic text-passport-accent">Passport</span>
+                    <span className="italic text-passport-accent">Stamped</span>
                   </h2>
                   <p className="font-mono text-[10px] tracking-[0.3em] mt-2 text-ink-dim uppercase">
-                    Passport · Pass · Pasaporte
+                    Stamped · Sellado · Estampillé
                   </p>
                 </div>
 
@@ -250,7 +250,7 @@ export default function Home() {
                 onClick={handleShare}
                 className="self-center -mt-2 font-mono text-[11px] uppercase tracking-[0.2em] text-ink-dim hover:text-passport-accent transition-colors px-5 py-2 border border-canvas-line rounded-full"
               >
-                ↗ Share Passport
+                ↗ Share Stamped
               </button>
 
               {/* Per-region breakdown */}
@@ -282,10 +282,10 @@ export default function Home() {
               {/* MRZ-style footer */}
               <footer className="mt-2 pt-6 border-t border-canvas-line">
                 <p className="font-mono text-[10px] text-ink-faint break-all leading-relaxed">
-                  {`${region.toUpperCase()}<<${scope === "allTime" ? "ALLTIME" : scope}<<${(session.user?.name ?? "ATHLETE").toUpperCase().replace(/\s+/g, "<")}<<RUNNING<<<<<PASSPORT<<<`}
+                  {`${region.toUpperCase()}<<${scope === "allTime" ? "ALLTIME" : scope}<<${(session.user?.name ?? "ATHLETE").toUpperCase().replace(/\s+/g, "<")}<<${category.toUpperCase()}<<<<<STAMPED<<<`}
                 </p>
                 <p className="font-mono text-[10px] tracking-[0.3em] uppercase text-ink-faint mt-3 text-center">
-                  · End of Passport ·
+                  · End of Stamped ·
                 </p>
               </footer>
             </>
