@@ -200,7 +200,7 @@ export default function Home() {
                     <span className="italic text-passport-accent">Stamped</span>
                   </h2>
                   <p className="font-mono text-[10px] tracking-[0.3em] mt-2 text-ink-dim uppercase">
-                    Stamped · Sellado · Estampillé
+                    Passport · Pass · Pasaporte
                   </p>
                 </div>
 
@@ -250,7 +250,7 @@ export default function Home() {
                 onClick={handleShare}
                 className="self-center -mt-2 font-mono text-[11px] uppercase tracking-[0.2em] text-ink-dim hover:text-passport-accent transition-colors px-5 py-2 border border-canvas-line rounded-full"
               >
-                ↗ Share Stamped
+                ↗ Share My Stamped Passport
               </button>
 
               {/* Per-region breakdown */}
@@ -258,15 +258,15 @@ export default function Home() {
                 <section className="flex flex-col gap-4">
                   <div className="flex items-baseline justify-between">
                     <h3 className="font-serif text-2xl">
-                      The <span className="italic">{placeLabel}</span>
+                      Your <span className="italic">Stamps</span>
                     </h3>
                     <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-dim">
                       {regions.length} {placeLabel}
                     </span>
                   </div>
                   <div className="flex flex-col gap-2">
-                    {regions.map((r, i) => (
-                      <RegionRow key={r.code} stats={r} rank={i + 1} category={category} />
+                    {regions.map((r) => (
+                      <RegionRow key={r.code} stats={r} category={category} />
                     ))}
                   </div>
                 </section>
@@ -376,19 +376,60 @@ function BigStat({
   );
 }
 
+function PassportStamp() {
+  return (
+    <svg
+      width="36"
+      height="28"
+      viewBox="0 0 36 28"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ transform: "rotate(-6deg)", flexShrink: 0 }}
+    >
+      <rect
+        x="1.5"
+        y="1.5"
+        width="33"
+        height="25"
+        rx="4"
+        stroke="#93D94E"
+        strokeWidth="1.5"
+        strokeDasharray="2.5 2"
+        opacity="0.55"
+      />
+      <rect
+        x="5"
+        y="5"
+        width="26"
+        height="18"
+        rx="2"
+        stroke="#93D94E"
+        strokeWidth="0.75"
+        opacity="0.3"
+      />
+      <path
+        d="M12 14l4 4 8-8"
+        stroke="#93D94E"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity="0.6"
+      />
+    </svg>
+  );
+}
+
 const ACTIVITY_LABEL: Record<Category, [string, string]> = {
   Run: ["run", "runs"],
   Hike: ["hike", "hikes"],
   Ride: ["ride", "rides"],
 };
 
-function RegionRow({ stats, rank, category }: { stats: RegionStats; rank: number; category: Category }) {
+function RegionRow({ stats, category }: { stats: RegionStats; category: Category }) {
   const [singular, plural] = ACTIVITY_LABEL[category];
   return (
-    <div className="bg-canvas-raised border border-canvas-line rounded-2xl px-4 py-3 flex items-center gap-4">
-      <span className="font-mono text-[10px] text-ink-faint w-6">
-        {rank.toString().padStart(2, "0")}
-      </span>
+    <div className="bg-canvas-raised border border-canvas-line rounded-2xl px-4 py-3 flex items-center gap-3">
+      <PassportStamp />
       <div className="flex-1 min-w-0">
         <h4 className="font-serif text-xl leading-tight truncate">{stats.name}</h4>
         <p className="font-mono text-[10px] uppercase tracking-wider text-ink-dim mt-0.5">
