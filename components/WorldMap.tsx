@@ -1,7 +1,7 @@
 "use client";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import { alpha3ToNumeric, alpha3ToAlpha2 } from "i18n-iso-countries";
-import type { ActivityPoint, Region } from "@/app/api/countries/route";
+import type { ActivityPoint, Region } from "@/lib/types";
 
 // Include both unpadded and zero-padded FIPS so geo.id matches regardless of topojson format
 const POSTAL_TO_FIPS: Record<string, string[]> = {
@@ -53,8 +53,8 @@ export function WorldMap({ region, activeCodes, activeRegions, points }: WorldMa
           style={{ width: "100%", height: "auto", display: "block" }}
         >
           <Geographies geography={isUSA ? USA_GEO : WORLD_GEO}>
-            {({ geographies }) =>
-              geographies.map((geo) => {
+            {({ geographies }: { geographies: any[] }) =>
+              geographies.map((geo: any) => {
                 const isActive = activeIdSet.has(String(geo.id));
                 return (
                   <Geography

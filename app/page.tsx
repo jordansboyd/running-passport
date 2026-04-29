@@ -6,7 +6,7 @@ import type {
   RegionStats,
   Category,
   Region,
-} from "@/app/api/countries/route";
+} from "@/lib/types";
 import { WorldMap } from "@/components/WorldMap";
 
 const CATEGORY_ICONS: Record<Category, string> = {

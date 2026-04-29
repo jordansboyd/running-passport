@@ -2,16 +2,18 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { loadStates, getState } from "@/lib/states";
+import {
+  CATEGORIES,
+  CATEGORY_LIST,
+  type Category,
+  type Region,
+  type RegionStats,
+  type ActivityPoint,
+  type ScopedData,
+  type CountriesResponse,
+} from "@/lib/types";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const crg = require("country-reverse-geocoding").country_reverse_geocoding();
-
-export const CATEGORIES = {
-  Run: ["Run", "TrailRun"],
-  Hike: ["Hike", "Walk"],
-  Ride: ["Ride", "VirtualRide"],
-} as const;
-export type Category = keyof typeof CATEGORIES;
-export const CATEGORY_LIST: Category[] = ["Run", "Hike", "Ride"];
 
 const SPORT_TO_CATEGORY: Record<string, Category> = Object.entries(CATEGORIES).reduce(
   (acc, [cat, sports]) => {
@@ -20,8 +22,6 @@ const SPORT_TO_CATEGORY: Record<string, Category> = Object.entries(CATEGORIES).r
   },
   {} as Record<string, Category>
 );
-
-export type Region = "world" | "usa";
 
 interface StravaActivity {
   sport_type: string;
@@ -46,35 +46,6 @@ interface EnrichedActivity {
   pr_count: number;
   country: { name: string; code: string };
   state: { name: string; code: string } | null;
-}
-
-export interface RegionStats {
-  name: string;
-  code: string;
-  activityCount: number;
-  totalDistance: number;
-  totalMovingTime: number;
-  averageSpeed: number;
-  totalElevationGain: number;
-  totalKudos: number;
-  totalPRs: number;
-}
-
-export interface ActivityPoint {
-  lat: number;
-  lng: number;
-}
-
-export interface ScopedData {
-  regions: RegionStats[];
-  points: ActivityPoint[];
-}
-
-export interface CountriesResponse {
-  categories: Category[];
-  years: number[];
-  world: Record<string, Record<string, ScopedData>>;
-  usa: Record<string, Record<string, ScopedData>>;
 }
 
 async function fetchAllActivities(token: string): Promise<StravaActivity[]> {
