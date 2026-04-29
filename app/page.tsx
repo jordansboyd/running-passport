@@ -196,7 +196,8 @@ export default function Home() {
                 {/* Title block */}
                 <div className="px-5 pt-2 pb-4">
                   <h2 className="font-serif text-5xl leading-[0.95] tracking-tight">
-                    Running <span className="italic text-passport-accent">Passport</span>
+                    {category === "Hike" ? "Hiking" : category === "Ride" ? "Cycling" : "Running"}{" "}
+                    <span className="italic text-passport-accent">Passport</span>
                   </h2>
                   <p className="font-mono text-[10px] tracking-[0.3em] mt-2 text-ink-dim uppercase">
                     Passport · Pass · Pasaporte
@@ -265,7 +266,7 @@ export default function Home() {
                   </div>
                   <div className="flex flex-col gap-2">
                     {regions.map((r, i) => (
-                      <RegionRow key={r.code} stats={r} rank={i + 1} />
+                      <RegionRow key={r.code} stats={r} rank={i + 1} category={category} />
                     ))}
                   </div>
                 </section>
@@ -375,7 +376,14 @@ function BigStat({
   );
 }
 
-function RegionRow({ stats, rank }: { stats: RegionStats; rank: number }) {
+const ACTIVITY_LABEL: Record<Category, [string, string]> = {
+  Run: ["run", "runs"],
+  Hike: ["hike", "hikes"],
+  Ride: ["ride", "rides"],
+};
+
+function RegionRow({ stats, rank, category }: { stats: RegionStats; rank: number; category: Category }) {
+  const [singular, plural] = ACTIVITY_LABEL[category];
   return (
     <div className="bg-canvas-raised border border-canvas-line rounded-2xl px-4 py-3 flex items-center gap-4">
       <span className="font-mono text-[10px] text-ink-faint w-6">
@@ -384,7 +392,7 @@ function RegionRow({ stats, rank }: { stats: RegionStats; rank: number }) {
       <div className="flex-1 min-w-0">
         <h4 className="font-serif text-xl leading-tight truncate">{stats.name}</h4>
         <p className="font-mono text-[10px] uppercase tracking-wider text-ink-dim mt-0.5">
-          {stats.activityCount} {stats.activityCount === 1 ? "act" : "acts"} ·{" "}
+          {stats.activityCount} {stats.activityCount === 1 ? singular : plural} ·{" "}
           {(stats.totalDistance / 1000).toFixed(1)} km · {formatTime(stats.totalMovingTime)}
         </p>
       </div>
