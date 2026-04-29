@@ -167,7 +167,7 @@ export default function Home() {
               </div>
 
               {/* PASSPORT POSTER — the shareable hero */}
-              <section className="relative grain bg-canvas-raised rounded-3xl border border-canvas-line overflow-hidden">
+              <section className="relative grain leather bg-canvas-raised rounded-3xl border border-canvas-line overflow-hidden">
                 {/* Corner marks */}
                 <div className="absolute top-3 left-3 font-mono text-[10px] text-ink-faint">+</div>
                 <div className="absolute top-3 right-3 font-mono text-[10px] text-ink-faint">+</div>

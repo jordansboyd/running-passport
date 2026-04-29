@@ -19,6 +19,28 @@
   background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
+/* Passport leather texture — coarser turbulence layered under the film grain */
+.leather {
+  position: relative;
+}
+.leather::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 0;
+  opacity: 0.055;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'><filter id='lth'><feTurbulence type='turbulence' baseFrequency='0.55 0.45' numOctaves='4' seed='8' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23lth)'/></svg>");
+  background-size: 400px 400px;
+}
+/* Ensure children sit above the texture pseudo-element */
+.leather > * {
+  position: relative;
+  z-index: 1;
+}
+
 /* Editorial corner mark */
 .corner-mark::before,
 .corner-mark::after {
