@@ -20,9 +20,6 @@
 }
 
 /* Passport leather texture — coarser turbulence layered under the film grain */
-.leather {
-  position: relative;
-}
 .leather::before {
   content: "";
   position: absolute;
@@ -30,15 +27,10 @@
   pointer-events: none;
   border-radius: inherit;
   z-index: 0;
-  opacity: 0.055;
-  mix-blend-mode: soft-light;
-  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'><filter id='lth'><feTurbulence type='turbulence' baseFrequency='0.55 0.45' numOctaves='4' seed='8' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23lth)'/></svg>");
+  opacity: 0.18;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'><filter id='lth'><feTurbulence type='turbulence' baseFrequency='0.6 0.4' numOctaves='5' seed='12' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncR type='linear' slope='1.8' intercept='-0.3'/><feFuncG type='linear' slope='1.8' intercept='-0.3'/><feFuncB type='linear' slope='1.8' intercept='-0.3'/></feComponentTransfer></filter><rect width='100%25' height='100%25' filter='url(%23lth)'/></svg>");
   background-size: 400px 400px;
-}
-/* Ensure children sit above the texture pseudo-element */
-.leather > * {
-  position: relative;
-  z-index: 1;
 }
 
 /* Editorial corner mark */
